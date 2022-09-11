@@ -9,6 +9,7 @@ export const createUser = async (req, res) => {
     const newUser = new UserModel({
       ...req.body,
       password: hash,
+      isAdmin: false,
     });
     await newUser.save();
     res.status(201).send("New user is created");
@@ -34,9 +35,13 @@ export const loginUser = async (req, res) => {
       return res.status(404).send("Wrong user or password.");
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1 day",
-    });
+    const token = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1 day",
+      }
+    );
 
     return res
       .cookie("session_token", token, {
