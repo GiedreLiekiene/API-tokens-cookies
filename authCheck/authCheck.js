@@ -45,6 +45,7 @@ export const verifySessionTokenAdmin = (req, res, next) => {
       return res.status(404).send("Token is not valid");
     }
     req.user = decodedToken;
+
     verifyAdmin(req, res, next);
   });
 };
