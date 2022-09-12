@@ -33,10 +33,15 @@ export const deleteUserById = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
+  //Solution no.1(task-1)
   //console.log(req.user.isAdmin);
 
   //if (!req.user.isAdmin) {
-  // delete req.params["isAdmin"];
+  //  delete req.body["isAdmin"];
+  //}
+
+  //Solution no.2(task-1)
+
   try {
     const filteredRequest = { ...req.body };
     delete filteredRequest.isAdmin;
