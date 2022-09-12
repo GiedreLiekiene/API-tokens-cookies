@@ -33,17 +33,43 @@ export const deleteUserById = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
+  //console.log(req.user.isAdmin);
+
+  //if (!req.user.isAdmin) {
+  // delete req.params["isAdmin"];
   try {
+    const filteredRequest = { ...req.body };
+    delete filteredRequest.isAdmin;
+
     const updateUser = await UserModel.findByIdAndUpdate(
       req.params.id,
       {
-        $set: req.body,
+        $set: req.user.isAdmin ? req.body : filteredRequest,
       },
       { new: true }
     );
-    res.status(200).json(updateUser);
+
+    //logs you out if you're an admin and you removed your own admin status
+
+    if (
+      req.user.isAdmin &&
+      !req.body.isAdmin &&
+      req.user.id === req.params.id
+    ) {
+      return res.clearCookie("session_token").status(200).json(updateUser);
+    }
+
+    //logic for invalidating other users' tokens
+
+    if (
+      req.user.isAdmin &&
+      !req.body.isAdmin &&
+      req.user.id !== req.params.id
+    ) {
+      return res.status(200).json(updatedUser);
+    }
+    return res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(405).send(error);
     console.error(error);
   }
 };
